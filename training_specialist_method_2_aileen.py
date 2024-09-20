@@ -160,7 +160,7 @@ if __name__ == "__main__":
     enemies = [8]
     n_hidden_neurons = 10
     n_population = 100
-    n_generations = 5
+    n_generations = 30
     mutation_rate = 0.2
 
     # Initialize and execute the optimizer

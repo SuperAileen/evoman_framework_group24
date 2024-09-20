@@ -12,28 +12,34 @@ from demo_controller import player_controller
 # imports DEAP library
 from deap import base, creator, tools, algorithms
 
+import datetime
+from line_plot_10_times_aileen import plot_stats
 
-class GeneticAlgorithmOptimizer:
-    def __init__(self, experiment_name, enemies, n_hidden_neurons=10, n_population=100, n_generations=30,
+
+class GeneticAlgorithmOptimizer_2:
+    def __init__(self, base_experiment_name, enemies, n_hidden_neurons=10, n_population=100, n_generations=30,
                  mutation_rate=0.2):
-        self.experiment_name = experiment_name
+        # Append current datetime to make the experiment name unique
+        current_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        self.experiment_name = f"{base_experiment_name}_{current_time}"
+        
+        # Create experiment directory before environment setup
+        if not os.path.exists(self.experiment_name):
+            os.makedirs(self.experiment_name)
+
         self.enemies = enemies
         self.n_hidden_neurons = n_hidden_neurons
         self.n_population = n_population
         self.n_generations = n_generations
         self.mutation_rate = mutation_rate
 
-        # Environment setup
+        # Environment setup after ensuring directory is created
         self.env = self.setup_environment()
         self.n_vars = self.calculate_num_weights()
 
         # DEAP setup
         self.toolbox = base.Toolbox()
         self.setup_deap()
-
-        # Create experiment directory
-        if not os.path.exists(self.experiment_name):
-            os.makedirs(self.experiment_name)
 
     def setup_environment(self):
         env = Environment(experiment_name=self.experiment_name,
@@ -95,13 +101,14 @@ class GeneticAlgorithmOptimizer:
 
         # Run the genetic algorithm
         population, logbook = algorithms.eaSimple(population, self.toolbox, cxpb=0.5, mutpb=self.mutation_rate,
-                                                  ngen=self.n_generations, stats=stats, halloffame=hof, verbose=True)
+                                                ngen=self.n_generations, stats=stats, halloffame=hof, verbose=True)
 
         # Get the best individual from the hall of fame
         best = hof[0]
         np.savetxt(f'{self.experiment_name}/best.txt', best)
 
-        return best
+        return population, logbook, hof
+
 
     def save_results(self):
         file = open(f'{self.experiment_name}/neuroended', 'w')
@@ -112,7 +119,16 @@ class GeneticAlgorithmOptimizer:
         ini = time.time()
 
         print('Starting Genetic Algorithm Optimization...')
-        best = self.run()
+        population, logbook, hof = self.run()
+
+        # Process and save detailed statistics from the logbook
+        gen, avg, max_, std = logbook.select("gen", "avg", "max", "std")
+        stats_data = np.array([gen, avg, max_, std])
+        stats_file_path = f'{self.experiment_name}/stats.txt'
+        np.savetxt(stats_file_path, stats_data, header='gen avg max std', comments='')
+
+        # Call the plot_stats function to generate the plot
+        plot_stats(stats_file_path, self.n_generations)
 
         fim = time.time()
         execution_time_minutes = round((fim - ini) / 60)
@@ -130,8 +146,8 @@ if __name__ == "__main__":
     if headless:
         os.environ["SDL_VIDEODRIVER"] = "dummy"
 
-    # Parameters
-    experiment_name = 'optimization_test'
+    # Basic experiment name
+    base_experiment_name = 'optimization_test'
     enemies = [8]
     n_hidden_neurons = 10
     n_population = 100
@@ -139,6 +155,6 @@ if __name__ == "__main__":
     mutation_rate = 0.2
 
     # Initialize and execute the optimizer
-    optimizer = GeneticAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
-                                          mutation_rate)
+    optimizer = GeneticAlgorithmOptimizer_2(base_experiment_name, enemies, n_hidden_neurons, n_population, n_generations, mutation_rate)
     optimizer.execute()
+

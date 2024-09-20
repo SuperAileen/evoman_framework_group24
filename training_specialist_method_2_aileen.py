@@ -13,7 +13,7 @@ from demo_controller import player_controller
 from deap import base, creator, tools, algorithms
 
 import datetime
-from line_plot_10_times_aileen import plot_stats
+from line_plot_1_times_aileen import plot_stats
 
 
 class GeneticAlgorithmOptimizer_2:
@@ -122,13 +122,17 @@ class GeneticAlgorithmOptimizer_2:
         population, logbook, hof = self.run()
 
         # Process and save detailed statistics from the logbook
-        gen, avg, max_, std = logbook.select("gen", "avg", "max", "std")
-        stats_data = np.array([gen, avg, max_, std])
+        gen = logbook.select("gen")
+        avg = logbook.select("avg")
+        max_ = logbook.select("max")
+        std = logbook.select("std")
+        
+        stats_data = np.column_stack((gen, avg, max_, std))  # Combine the statistics into a single array
         stats_file_path = f'{self.experiment_name}/stats.txt'
-        np.savetxt(stats_file_path, stats_data, header='gen avg max std', comments='')
+        np.savetxt(stats_file_path, stats_data, header='gen avg max std', comments='', fmt='%f')
 
         # Call the plot_stats function to generate the plot
-        plot_stats(stats_file_path, self.n_generations)
+        plot_stats(stats_file_path, self.n_generations, self.experiment_name)
 
         fim = time.time()
         execution_time_minutes = round((fim - ini) / 60)
@@ -138,6 +142,11 @@ class GeneticAlgorithmOptimizer_2:
         print(f'Execution time: {execution_time_seconds} seconds')
 
         self.save_results()
+        full_path = os.path.abspath(stats_file_path)
+        print(full_path) 
+        return full_path   # Return the path to the stats file for further analysis
+
+
 
 
 if __name__ == "__main__":
@@ -147,11 +156,11 @@ if __name__ == "__main__":
         os.environ["SDL_VIDEODRIVER"] = "dummy"
 
     # Basic experiment name
-    base_experiment_name = 'optimization_test'
+    base_experiment_name = 'optimization_test_method_2'
     enemies = [8]
     n_hidden_neurons = 10
     n_population = 100
-    n_generations = 30
+    n_generations = 5
     mutation_rate = 0.2
 
     # Initialize and execute the optimizer

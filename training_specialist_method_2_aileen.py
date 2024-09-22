@@ -78,12 +78,6 @@ class GeneticAlgorithmOptimizer_2:
         self.toolbox.register("select", tools.selRoulette)  # Roulette wheel selection
 
     def evaluate(self, individual):
-        result = self.env.play(pcont=np.array(individual))
-        player_energy, enemy_energy = result[0], result[1]
-
-        individual_gain = player_energy - enemy_energy
-        with open(f'{self.experiment_name}/individual_gains.txt', 'a') as file:
-            file.write(f"{individual_gain}\n")
         return self.env.play(pcont=np.array(individual))[0],
 
     def run(self):

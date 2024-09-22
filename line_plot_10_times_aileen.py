@@ -49,7 +49,7 @@ def plot_aggregated_stats(aggregated_data, num_runs):
     plt.legend()
     plt.grid(True)
     plt.xlim(0, max(generations))
-    plt.savefig('aggregated_fitness_plot.png')
+    plt.savefig('aggregated_fitness_plot_method_2.png')
     plt.show()
 
 

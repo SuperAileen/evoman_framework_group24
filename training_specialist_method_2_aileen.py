@@ -13,7 +13,7 @@ from demo_controller import player_controller
 from deap import base, creator, tools, algorithms
 
 import datetime
-from line_plot_1_times_aileen import plot_stats
+from line_plot_once_method_2_aileen import plot_stats
 
 
 class GeneticAlgorithmOptimizer_2:

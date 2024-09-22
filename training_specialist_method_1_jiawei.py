@@ -13,9 +13,9 @@ from demo_controller import player_controller
 from deap import base, creator, tools, algorithms
 
 import datetime
-from line_plot_1_times_aileen import plot_stats
+from line_plot_once_method_1_jiawei import plot_stats
 
-class GeneticAlgorithmOptimizer:
+class GeneticAlgorithmOptimizer1:
     def __init__(self, base_experiment_name, enemies, n_hidden_neurons=10, n_population=100, n_generations=30,
                  mutation_rate=0.2):
         # Append current datetime to make the experiment name unique
@@ -152,7 +152,7 @@ if __name__ == "__main__":
         os.environ["SDL_VIDEODRIVER"] = "dummy"
 
     # Parameters
-    experiment_name = 'optimization_test'
+    experiment_name = 'optimization_test_method_1'
     enemies = [8]
     n_hidden_neurons = 10
     n_population = 100
@@ -160,6 +160,6 @@ if __name__ == "__main__":
     mutation_rate = 0.2
 
     # Initialize and execute the optimizer
-    optimizer = GeneticAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
+    optimizer = GeneticAlgorithmOptimizer1(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
                                           mutation_rate)
     optimizer.execute()

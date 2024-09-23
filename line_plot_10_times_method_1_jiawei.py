@@ -43,7 +43,7 @@ def plot_aggregated_stats(aggregated_data, num_runs):
     plt.fill_between(generations, avg_fitness - std_dev, avg_fitness + std_dev, color='b', alpha=0.2)
     plt.plot(generations, max_fitness, label='Max Fitness', color='r')
     plt.fill_between(generations, max_fitness - std_dev, max_fitness + std_dev, color='r', alpha=0.2)
-    plt.title('Aggregated Fitness over Generations Using Method 1 ({} runs)'.format(num_runs))
+    plt.title('Aggregated Fitness over Generations Using Method 1 ({} runs_lingfeng)'.format(num_runs))
     plt.xlabel('Generation')
     plt.ylabel('Fitness')
     plt.legend()

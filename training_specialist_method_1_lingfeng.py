@@ -152,7 +152,7 @@ if __name__ == "__main__":
         os.environ["SDL_VIDEODRIVER"] = "dummy"
 
     # Parameters
-    experiment_name = 'optimization_test_method_1'
+    experiment_name = 'optimization_train_lingfeng_m1'
     enemies = [8]
     n_hidden_neurons = 10
     n_population = 100
@@ -163,3 +163,4 @@ if __name__ == "__main__":
     optimizer = GeneticAlgorithmOptimizer1(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
                                           mutation_rate)
     optimizer.execute()
+

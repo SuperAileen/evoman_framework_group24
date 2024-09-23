@@ -31,12 +31,12 @@ env = Environment(experiment_name=experiment_name,
 				  level=2,
 				  visuals=True)
 
-enemy_list=[1,2,3]
+enemy_list=[6,7,8]
+
 
 # tests saved demo solutions for each enemy
 for en in enemy_list:
-      
-
+    
 	#Update the enemy
 	env.update_parameter('enemies',[en])
 
@@ -44,8 +44,10 @@ for en in enemy_list:
 	sol = np.loadtxt(experiment_name+'/best.txt')
 	print('\n LOADING SAVED SPECIALIST SOLUTION FOR ENEMY '+str(en)+' \n')
 	fitness, player_life, enemy_life, time_taken=env.play(sol)
-	print(f"Fitness: {fitness}, Player Life: {player_life}, Enemy Life: {enemy_life}, Time Taken: {time_taken}")
+	indivdual_gain=player_life-enemy_life
+	print(f"Fitness: {fitness}, Time Taken: {time_taken}, indivdual_gain: {indivdual_gain}")
+
 
 print("Done testing all enemies.")
-# print(fitness, player_life, enemy_life, time_taken)
+
 

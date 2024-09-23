@@ -67,8 +67,8 @@ class GeneticAlgorithmOptimizer1:
         # Register attribute generator and individual population structure
         self.toolbox.register("attr_float", np.random.uniform, dom_l, dom_u)
         self.toolbox.register("individual", tools.initRepeat, creator.Individual, self.toolbox.attr_float,
-                              n=self.n_vars)
-        self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
+                              n=self.n_vars)  # Individual structure is an array of weights (floats)
+        self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)  # Population structure a list of individuals
 
         # Register operators
         self.toolbox.register("evaluate", self.evaluate)
@@ -81,12 +81,12 @@ class GeneticAlgorithmOptimizer1:
 
     def run(self):
         # Create initial population
-        population = self.toolbox.population(n=self.n_population)
+        population = self.toolbox.population(n=self.n_population) # Generate the initial population of individuals， the weights of the neural network are initialized randomly
 
         # Evaluate the entire population
-        fitnesses = list(map(self.toolbox.evaluate, population))
+        fitnesses = list(map(self.toolbox.evaluate, population))  # Evaluate all individuals in the population
         for ind, fit in zip(population, fitnesses):
-            ind.fitness.values = fit
+            ind.fitness.values = fit   # Assign the fitness to the individual
 
         # DEAP Statistics setup
         stats = tools.Statistics(lambda ind: ind.fitness.values)

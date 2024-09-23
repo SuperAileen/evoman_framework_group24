@@ -32,6 +32,7 @@ def aggregate_stats(runs):
     return aggregated_data
 
 
+
 def plot_aggregated_stats(aggregated_data, num_runs):
     generations = aggregated_data[:, 0]
     avg_fitness = aggregated_data[:, 1]

@@ -33,7 +33,6 @@ env = Environment(experiment_name=experiment_name,
 
 enemy_list=[1,2,3]
 
-
 # tests saved demo solutions for each enemy
 for en in enemy_list:
       
@@ -50,15 +49,3 @@ for en in enemy_list:
 print("Done testing all enemies.")
 # print(fitness, player_life, enemy_life, time_taken)
 
-
-'''
-# loads file with the best solution for testing
-if run_mode =='test':
-
-    bsol = np.loadtxt(experiment_name+'/best.txt')
-    print( '\n RUNNING SAVED BEST SOLUTION \n')
-    env.update_parameter('speed','normal')
-    evaluate([bsol])
-
-    sys.exit(0)
-'''

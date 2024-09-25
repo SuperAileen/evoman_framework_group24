@@ -45,13 +45,13 @@ def plot_aggregated_stats(aggregated_data_1, aggregated_data_2, num_runs):
 
     plt.figure(figsize=(10, 6))
     
-    # Plot method 1
+    # Plot EA 1
     plt.plot(generations_1, avg_fitness_1, label='GA - Average Fitness', color='red', linestyle='--')
     plt.fill_between(generations_1, avg_fitness_1 - std_dev_1, avg_fitness_1 + std_dev_1, color='red', alpha=0.2)
     plt.plot(generations_1, max_fitness_1, label='GA - Max Fitness', color='red')
     plt.fill_between(generations_1, max_fitness_1 - std_dev_1, max_fitness_1 + std_dev_1, color='red', alpha=0.2)
 
-    # Plot method 2
+    # Plot EA 2
     plt.plot(generations_2, avg_fitness_2, label='ES - Average Fitness', color='blue', linestyle='--')
     plt.fill_between(generations_2, avg_fitness_2 - std_dev_2, avg_fitness_2 + std_dev_2, color='blue', alpha=0.2)
     plt.plot(generations_2, max_fitness_2, label='ES - Max Fitness', color='blue')

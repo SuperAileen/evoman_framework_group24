@@ -152,7 +152,7 @@ if __name__ == "__main__":
         os.environ["SDL_VIDEODRIVER"] = "dummy"
 
     # Parameters
-    experiment_name = 'optimization_test_method_1'
+    experiment_name = 'optimization_train_method_1'
     enemies = [8]
     n_hidden_neurons = 10
     n_population = 100

@@ -5,6 +5,7 @@ import time
 import numpy as np
 from math import fabs, sqrt
 import glob
+import sys
 
 from evoman.environment import Environment
 from demo_controller import player_controller
@@ -251,11 +252,19 @@ if __name__ == "__main__":
     n_generations = 30
     mutation_rate = 0.2
 
-    # Initialize and execute the optimizer
-    optimizer1 = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
-                                          mutation_rate, sigma=0.1, mode = "GA")
-    optimizer1.execute()
 
-    optimizer2 = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
-                                          mutation_rate, sigma=0.1, mode = "ES")
-    optimizer2.execute()
+
+    if len(sys.argv) == 1:
+        # Initialize and execute the optimizer
+        optimizer1 = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
+                                              mutation_rate, sigma=0.1, mode = "GA")
+        optimizer1.execute()
+
+        optimizer2 = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
+                                              mutation_rate, sigma=0.1, mode = "ES")
+        optimizer2.execute()
+    elif len(sys.argv) > 1:
+        mode = sys.argv[1]
+        optimizer = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
+                                              mutation_rate, sigma=0.1, mode=mode)
+        optimizer.execute()

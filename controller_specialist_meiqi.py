@@ -34,6 +34,7 @@ env = Environment(experiment_name='best_experiment_test',
 				player_controller=player_controller(n_hidden_neurons),
 				speed="normal",
 				enemymode="static",
+                logs="off",
                 randomini="yes",
 				level=2,
 				visuals=True)
@@ -49,6 +50,7 @@ for method in method_list:
         sol = find_best_solution(method, enemy)
         individual_gain_list = []
         for i in range(5):
+            
             _, player_life, enemy_life, _=env.play(sol)
             indivdual_gain=player_life-enemy_life
             individual_gain_list.append(indivdual_gain)

@@ -132,7 +132,7 @@ class GeneticAlgorithmOptimizer_2:
         np.savetxt(stats_file_path, stats_data, header='gen avg max std', comments='', fmt='%f')
 
         # Call the plot_stats function to generate the plot
-        plot_stats(stats_file_path, self.n_generations, self.experiment_name)
+        # plot_stats(stats_file_path, self.n_generations, self.experiment_name)
 
         fim = time.time()
         execution_time_minutes = round((fim - ini) / 60)
@@ -156,7 +156,7 @@ if __name__ == "__main__":
         os.environ["SDL_VIDEODRIVER"] = "dummy"
 
     # Basic experiment name
-    base_experiment_name = 'optimization_test_method_2'
+    base_experiment_name = 'optimization_train_method_2'
     enemies = [8]
     n_hidden_neurons = 10
     n_population = 100

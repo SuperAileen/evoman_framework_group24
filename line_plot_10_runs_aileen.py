@@ -9,9 +9,9 @@ def run_optimizer(script_name):
     result = subprocess.run(['python', script_name], cwd=cwd, capture_output=True, text=True)
     
     # Use regex to find the path to the stats.txt file
-    print(f"Output from {script_name}:", result.stdout)  # Print the output from the script
+    print(f"Output from {script_name}:", result.stdout)  
     output_lines = result.stdout.strip().split('\n')
-    stats_path = output_lines[-1]  # stats.txt path is the last line of the output
+    stats_path = output_lines[-1]  
     if os.path.exists(stats_path):
         return stats_path
     else:
@@ -43,38 +43,35 @@ def plot_aggregated_stats(aggregated_data_1, aggregated_data_2, num_runs):
     max_fitness_2 = aggregated_data_2[:, 2]
     std_dev_2 = aggregated_data_2[:, 3]
 
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(10, 6))
     
     # Plot method 1
-    plt.plot(generations_1, avg_fitness_1, label='Method 1 - Average Fitness', color='b')
-    plt.fill_between(generations_1, avg_fitness_1 - std_dev_1, avg_fitness_1 + std_dev_1, color='b', alpha=0.2)
-    plt.plot(generations_1, max_fitness_1, label='Method 1 - Max Fitness', color='r')
-    plt.fill_between(generations_1, max_fitness_1 - std_dev_1, max_fitness_1 + std_dev_1, color='r', alpha=0.2)
+    plt.plot(generations_1, avg_fitness_1, label='GA - Average Fitness', color='red', linestyle='--')
+    plt.fill_between(generations_1, avg_fitness_1 - std_dev_1, avg_fitness_1 + std_dev_1, color='red', alpha=0.2)
+    plt.plot(generations_1, max_fitness_1, label='GA - Max Fitness', color='red')
+    plt.fill_between(generations_1, max_fitness_1 - std_dev_1, max_fitness_1 + std_dev_1, color='red', alpha=0.2)
 
     # Plot method 2
-    plt.plot(generations_2, avg_fitness_2, label='Method 2 - Average Fitness', color='g')
-    plt.fill_between(generations_2, avg_fitness_2 - std_dev_2, avg_fitness_2 + std_dev_2, color='g', alpha=0.2)
-    plt.plot(generations_2, max_fitness_2, label='Method 2 - Max Fitness', color='orange')
-    plt.fill_between(generations_2, max_fitness_2 - std_dev_2, max_fitness_2 + std_dev_2, color='orange', alpha=0.2)
+    plt.plot(generations_2, avg_fitness_2, label='ES - Average Fitness', color='blue', linestyle='--')
+    plt.fill_between(generations_2, avg_fitness_2 - std_dev_2, avg_fitness_2 + std_dev_2, color='blue', alpha=0.2)
+    plt.plot(generations_2, max_fitness_2, label='ES - Max Fitness', color='blue')
+    plt.fill_between(generations_2, max_fitness_2 - std_dev_2, max_fitness_2 + std_dev_2, color='blue', alpha=0.2)
 
-    plt.title('Aggregated Fitness over Generations for Method 1 and Method 2 ({} runs)'.format(num_runs))
+    plt.title('Aggregated Fitness over Generations for GA and ES - Enemy 2 (Air Man) ({} runs)'.format(num_runs))
     plt.xlabel('Generation')
     plt.ylabel('Fitness')
     plt.legend()
-    plt.grid(True)
+    plt.grid(False)
     plt.xlim(min(generations_1.min(), generations_2.min()) - 1, max(generations_1.max(), generations_2.max()) + 1)
-    plt.savefig('aggregated_fitness_comparison.png')
+    plt.savefig('aggregated_fitness_comparison_enemy_2_air_man.png')
     plt.show()
 
 
 if __name__ == "__main__":
     num_runs = 10 
     
-    # Aggregate data for method 1
     aggregated_data_1 = aggregate_stats('training_specialist_method_1_jiawei.py', num_runs)
-    
-    # Aggregate data for method 2
+
     aggregated_data_2 = aggregate_stats('training_specialist_method_2_aileen.py', num_runs)
     
-    # Plot both methods on the same graph
     plot_aggregated_stats(aggregated_data_1, aggregated_data_2, num_runs)

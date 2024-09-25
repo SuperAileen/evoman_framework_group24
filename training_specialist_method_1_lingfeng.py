@@ -16,11 +16,20 @@ import datetime
 from line_plot_once_method_1_jiawei import plot_stats
 
 class GeneticAlgorithmOptimizer1:
+
     def __init__(self, base_experiment_name, enemies, n_hidden_neurons=10, n_population=100, n_generations=30,
                  mutation_rate=0.2):
         # Append current datetime to make the experiment name unique
         current_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         self.experiment_name = f"{base_experiment_name}_{current_time}"
+
+        parent_directory = 'experiments_train_lingfeng'
+
+        if not os.path.exists(parent_directory):
+            os.makedirs(parent_directory)
+
+        # Create a unique experiment directory inside the parent directory
+        self.experiment_name = os.path.join(parent_directory, f"{base_experiment_name}_{current_time}")
 
         # Create experiment directory before environment setup
         if not os.path.exists(self.experiment_name):

@@ -19,6 +19,8 @@ experiment_name = 'optimization_train_lingfeng_m1_20240923-184821'
 if not os.path.exists(experiment_name):
     os.makedirs(experiment_name)
 
+
+
 # Update the number of neurons for this specific example
 n_hidden_neurons = 10
 
@@ -35,11 +37,13 @@ enemy_list=[6,7,8]
 
 
 # tests saved demo solutions for each enemy
+
+
 for en in enemy_list:
     
 	#Update the enemy
 	env.update_parameter('enemies',[en])
-
+	
 	# Load specialist controller
 	sol = np.loadtxt(experiment_name+'/best.txt')
 	print('\n LOADING SAVED SPECIALIST SOLUTION FOR ENEMY '+str(en)+' \n')
@@ -51,3 +55,4 @@ for en in enemy_list:
 print("Done testing all enemies.")
 
 
+### if the case is only 5 times of the certain enemy 

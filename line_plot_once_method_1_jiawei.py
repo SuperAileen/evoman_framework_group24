@@ -22,7 +22,7 @@ def plot_stats(file_path, n_generations, output_dir):
     plt.grid(True)
     plt.xlim(generations.min() - 1, generations.max() + 1)
     plt.savefig(os.path.join(output_dir, 'fitness_plot.png'))  # Save the plot in the specified directory
-    plt.show()
+    #plt.show()
 
 if __name__ == "__main__":
     if len(sys.argv) > 2:

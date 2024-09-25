@@ -139,7 +139,7 @@ class GeneticAlgorithmOptimizer1:
         np.savetxt(stats_file_path, stats_data, header='gen avg max std', comments='', fmt='%f')
 
         # Call the plot_stats function to generate the plot
-        plot_stats(stats_file_path, self.n_generations, self.experiment_name)
+        # plot_stats(stats_file_path, self.n_generations, self.experiment_name)
 
         fim = time.time()
         execution_time_minutes = round((fim - ini) / 60)

@@ -152,6 +152,9 @@ class EvolutAlgorithmOptimizer:
         stats.register("min", np.min)
         stats.register("max", np.max)
 
+        record = stats.compile(population)
+        logbook.record(gen=0, **record)
+
         for gen in range(self.n_generations+1):
             parents = list(map(self.toolbox.clone, population)) 
             offspring = parents

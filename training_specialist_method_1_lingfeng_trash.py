@@ -129,9 +129,11 @@ class GeneticAlgorithmOptimizer1:
             ind.fitness.values = (fit,)  # Assign the fitness to the individual
         
         ## 问题还是出在没定义gain上面 creator 
+        '''
         gainness=list(map(self.toolbox.gain_f, population))
         for ind, (gain, ) in zip(population, gainness):
-            ind.gainness.values = gain 
+            ind.gainness.values = gain
+        '''
         
     
 
@@ -143,8 +145,6 @@ class GeneticAlgorithmOptimizer1:
         stats.register("max", np.max)
 
 
-        
-            
 
         hof = tools.HallOfFame(1, similar=np.array_equal)
 
@@ -152,9 +152,16 @@ class GeneticAlgorithmOptimizer1:
         # Run the genetic algorithm
         population, logbook = algorithms.eaSimple(population, self.toolbox, cxpb=0.5, mutpb=self.mutation_rate,
                                                   ngen=self.n_generations, stats=stats, halloffame=hof, verbose=True)
+        
+        # final individual gain 
+        gainness=list(map(self.toolbox.gain_f, population))
+        for ind, (gain, ) in zip(population, gainness):
+            ind.gain = gain
+        
+        avg_gain = np.mean([ind.gain for ind in population])
+        max_gain = np.max([ind.gain for ind in population])
+        print(f'Average gain: {avg_gain}, Max gain: {max_gain} in the last generation')
 
-
-       
 
         # Get the best individual from the hall of fame
         best = hof[0]
@@ -209,7 +216,7 @@ if __name__ == "__main__":
 
     # Parameters
     experiment_name = 'optimization_train_lingfeng_m1'
-    enemies_list = [[2], [3], [5]]  # List of enemy combinations
+    enemies_list=[[i] for i in range(1,9)]
     n_hidden_neurons = 10
     n_population = 100
     n_generations = 30

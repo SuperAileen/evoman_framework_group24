@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 import subprocess
 import os
 import re
-from training_specialist_jiawei import EvolutAlgorithmOptimizer  # 导入类 
+from training_specialist_lingfeng import EvolutAlgorithmOptimizer  # 导入类 
+from training_specialist_lingfeng import save_gain_results, collect_gain_results
+import pandas as pd 
 
 
 def run_optimizer(mode):
@@ -13,7 +15,7 @@ def run_optimizer(mode):
     if headless:
         os.environ["SDL_VIDEODRIVER"] = "dummy"
 
-    experiment_name = 'optimization_test'
+    experiment_name = 'optimization_train'
     enemies = [2]
     n_hidden_neurons = 10
     n_population = 100
@@ -29,6 +31,8 @@ def run_optimizer(mode):
         return stats_path
     else:
         raise Exception(f"Could not find stats.txt path for {mode}")
+    
+
 
 def aggregate_stats(mode, runs):
     all_data = []

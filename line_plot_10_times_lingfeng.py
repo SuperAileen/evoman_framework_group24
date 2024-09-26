@@ -3,28 +3,37 @@ import matplotlib.pyplot as plt
 import subprocess
 import os
 import re
-from training_specialist_jiawei import EvolutAlgorithmOptimizer  # 导入类
+from training_specialist_jiawei import EvolutAlgorithmOptimizer  # 导入类 
 
 
-def run_optimizer(script_name, mode):
-    cwd = os.getcwd()
-    result = subprocess.run([r'C:\Users\liaojw\Documents\study\course\Evolutionary Computing\assignment1\evoman_framework_group24\venv\Scripts\python.exe', script_name, mode], cwd=cwd, capture_output=True, text=True)
+def run_optimizer(mode):
 
-    print(f"Output from {script_name}:", result.stdout)
-    output_lines = result.stdout.strip().split('\n')
-    stats_path = output_lines[-1]
+    # Set headless mode for faster experiments
+    headless = True
+    if headless:
+        os.environ["SDL_VIDEODRIVER"] = "dummy"
+
+    experiment_name = 'optimization_test'
+    enemies = [2]
+    n_hidden_neurons = 10
+    n_population = 100
+    n_generations = 30
+    mutation_rate = 0.2
+    sigma = 0.1
+
+    optimizer = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
+                                         mutation_rate, sigma, mode=mode)
+    stats_path = optimizer.execute()
+
     if os.path.exists(stats_path):
         return stats_path
     else:
-        raise Exception(f"Could not find stats.txt path in the output from {script_name}")
-    
+        raise Exception(f"Could not find stats.txt path for {mode}")
 
-
-
-def aggregate_stats(script_name, mode, runs):
+def aggregate_stats(mode, runs):
     all_data = []
     for _ in range(runs):
-        stats_path = run_optimizer(script_name, mode)
+        stats_path = run_optimizer(mode)
         data = np.genfromtxt(stats_path, skip_header=1)
         all_data.append(data)
 
@@ -35,7 +44,6 @@ def aggregate_stats(script_name, mode, runs):
     aggregated_data = np.column_stack(
         (mean_data[:, 0], mean_data[:, 1], mean_data[:, 2], std_data[:, 1], std_data[:, 2]))
     return aggregated_data
-
 
 def plot_aggregated_stats(aggregated_data_1, aggregated_data_2, num_runs):
     generations_1 = aggregated_data_1[:, 0]
@@ -50,13 +58,13 @@ def plot_aggregated_stats(aggregated_data_1, aggregated_data_2, num_runs):
 
     plt.figure(figsize=(10, 6))
 
-    # Plot EA1
+    # Plot EA1 (GA)
     plt.plot(generations_1, avg_fitness_1, label='GA - Average Fitness', color='red', linestyle='--')
     plt.fill_between(generations_1, avg_fitness_1 - std_dev_1, avg_fitness_1 + std_dev_1, color='red', alpha=0.2)
     plt.plot(generations_1, max_fitness_1, label='GA - Max Fitness', color='red')
     plt.fill_between(generations_1, max_fitness_1 - std_dev_1, max_fitness_1 + std_dev_1, color='red', alpha=0.2)
 
-    # Plot EA2
+    # Plot EA2 (ES)
     plt.plot(generations_2, avg_fitness_2, label='ES - Average Fitness', color='blue', linestyle='--')
     plt.fill_between(generations_2, avg_fitness_2 - std_dev_2, avg_fitness_2 + std_dev_2, color='blue', alpha=0.2)
     plt.plot(generations_2, max_fitness_2, label='ES - Max Fitness', color='blue')
@@ -71,15 +79,11 @@ def plot_aggregated_stats(aggregated_data_1, aggregated_data_2, num_runs):
     plt.savefig('aggregated_fitness_comparison_enemy_2_air_man.png')
     plt.show()
 
-
 if __name__ == "__main__":
     num_runs = 10
 
-    aggregated_data_1 = aggregate_stats('training_specialist_jiawei.py', "GA", num_runs)
+    aggregated_data_1 = aggregate_stats("GA", num_runs)
 
-    aggregated_data_2 = aggregate_stats('training_specialist_jiawei.py', "ES", num_runs)
+    aggregated_data_2 = aggregate_stats("ES", num_runs)
 
     plot_aggregated_stats(aggregated_data_1, aggregated_data_2, num_runs)
-
-
-

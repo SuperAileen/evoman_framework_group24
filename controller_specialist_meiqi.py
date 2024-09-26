@@ -15,7 +15,11 @@ import glob
 import matplotlib.pyplot as plt
 
 def find_best_solution(method, enemy):
-    best_files = glob.glob(f'optimization_train_method_{method}_{enemy}_*'+'/best.txt')
+    print(f'optimization_test_[{enemy}]_{method}_*'+'/best.txt')
+    file_name = "optimization_test_[[]2[]]_GA_20240926-104720/best.txt"
+    best_files = glob.glob(file_name)
+    # best_files = glob.glob(f'optimization_test_[[]{enemy}[]]_{method}_*'+'/best.txt')
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n",best_files)
     best_fitness = -np.inf
     best_solution = None
 
@@ -29,6 +33,9 @@ def find_best_solution(method, enemy):
     return best_solution
 
 n_hidden_neurons = 10
+
+# import os
+# os.environ["SDL_VIDEODRIVER"] = "dummy"
 env = Environment(experiment_name='best_experiment_test',
                 playermode="ai",
 				player_controller=player_controller(n_hidden_neurons),
@@ -40,8 +47,8 @@ env = Environment(experiment_name='best_experiment_test',
 				visuals=True)
 
 results = {}
-method_list = [1]
-enemy_list=[6, 7, 8]
+method_list = ["GA"]
+enemy_list=[2]
 
 for method in method_list:
      for enemy in enemy_list:

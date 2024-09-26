@@ -5,6 +5,7 @@ import time
 import numpy as np
 from math import fabs, sqrt
 import glob
+import random 
 
 from evoman.environment import Environment
 from demo_controller import player_controller
@@ -24,6 +25,8 @@ class GeneticAlgorithmOptimizer1:
         self.experiment_name = f"{base_experiment_name}_{current_time}"
 
         parent_directory = 'experiments_train_lingfeng'
+        #random_number = random.randint(1, 9999)  # Generate a random number between 1000 and 9999
+        parent_directory = f'{parent_directory}_{enemies[0]}'
 
         if not os.path.exists(parent_directory):
             os.makedirs(parent_directory)
@@ -73,6 +76,8 @@ class GeneticAlgorithmOptimizer1:
         creator.create("FitnessMax", base.Fitness, weights=(1.0,))
         creator.create("Individual", np.ndarray, fitness=creator.FitnessMax)
 
+        
+
         # Register attribute generator and individual population structure
         self.toolbox.register("attr_float", np.random.uniform, dom_l, dom_u)
         self.toolbox.register("individual", tools.initRepeat, creator.Individual, self.toolbox.attr_float,
@@ -81,21 +86,54 @@ class GeneticAlgorithmOptimizer1:
 
         # Register operators
         self.toolbox.register("evaluate", self.evaluate)
+        self.toolbox.register("gain_f", self.gain_f)
         self.toolbox.register("mate", tools.cxBlend, alpha=0.5)
         self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=self.mutation_rate)
         self.toolbox.register("select", tools.selTournament, tournsize=3)
 
+    
+    def init_individual_with_gain(self):
+            ind = creator.Individual(np.random.rand(self.n_vars))
+            ind.gain = 0.0  # Initialize the gain attribute with a default value (e.g., 0.0)
+            return ind
+    
+
     def evaluate(self, individual):
-        return self.env.play(pcont=np.array(individual))[0],  # Return the fitness
+        # Assuming that the environment returns (fitness, player_life, enemy_life)
+        result = self.env.play(pcont=np.array(individual))
+        fitness = result[0]  # Get fitness
+
+
+        # Return only the fitness, since we don't want to log the gain into the file
+        return fitness,
+
+    def gain_f(self, individual):
+
+        result = self.env.play(pcont=np.array(individual))
+        player_life = result[1]  # Player's remaining life
+        enemy_life = result[2]  # Enemy's remaining life
+
+        individual_gain = player_life - enemy_life  #
+
+        return individual_gain,
+
+        
 
     def run(self):
         # Create initial population
-        population = self.toolbox.population(n=self.n_population) # Generate the initial population of individuals， the weights of the neural network are initialized randomly
-
+        #population = self.toolbox.population(n=self.n_population) # Generate the initial population of individuals， the weights of the neural network are initialized randomly
+        population = [self.init_individual_with_gain() for _ in range(self.n_population)]
         # Evaluate the entire population
         fitnesses = list(map(self.toolbox.evaluate, population))  # Evaluate all individuals in the population
-        for ind, fit in zip(population, fitnesses):
-            ind.fitness.values = fit   # Assign the fitness to the individual
+        for ind, (fit, ) in zip(population, fitnesses): 
+            ind.fitness.values = (fit,)  # Assign the fitness to the individual
+        
+        ## 问题还是出在没定义gain上面 creator 
+        gainness=list(map(self.toolbox.gain_f, population))
+        for ind, (gain, ) in zip(population, gainness):
+            ind.gainness.values = gain 
+        
+    
 
         # DEAP Statistics setup
         stats = tools.Statistics(lambda ind: ind.fitness.values)
@@ -104,18 +142,27 @@ class GeneticAlgorithmOptimizer1:
         stats.register("min", np.min)
         stats.register("max", np.max)
 
-        # Hall of Fame setup
+
+        
+            
+
         hof = tools.HallOfFame(1, similar=np.array_equal)
+
 
         # Run the genetic algorithm
         population, logbook = algorithms.eaSimple(population, self.toolbox, cxpb=0.5, mutpb=self.mutation_rate,
                                                   ngen=self.n_generations, stats=stats, halloffame=hof, verbose=True)
+
+
+       
 
         # Get the best individual from the hall of fame
         best = hof[0]
         np.savetxt(f'{self.experiment_name}/best.txt', best)
 
         return population, logbook, hof
+
+
 
     def save_results(self):
         file = open(f'{self.experiment_name}/neuroended', 'w')
@@ -162,19 +209,18 @@ if __name__ == "__main__":
 
     # Parameters
     experiment_name = 'optimization_train_lingfeng_m1'
-    enemies = [8]
+    enemies_list = [[2], [3], [5]]  # List of enemy combinations
     n_hidden_neurons = 10
     n_population = 100
     n_generations = 30
     mutation_rate = 0.2
 
-    # Initialize and execute the optimizer
-    optimizer = GeneticAlgorithmOptimizer1(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
-                                          mutation_rate)
-    optimizer.execute()
-
-
-
+    # Iterate over each enemy combination and run the optimizer
+    for enemies in enemies_list:
+        print(f"\nStarting optimization for enemies: {enemies}")
+        optimizer = GeneticAlgorithmOptimizer1(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
+                                               mutation_rate)
+        optimizer.execute()
 
 
 

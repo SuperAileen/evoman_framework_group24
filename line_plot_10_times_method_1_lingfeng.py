@@ -58,4 +58,5 @@ if __name__ == "__main__":
     num_runs = 10  # Number of runs to aggregate statistics
     aggregated_data = aggregate_stats(num_runs)
     plot_aggregated_stats(aggregated_data, num_runs)
+    
 

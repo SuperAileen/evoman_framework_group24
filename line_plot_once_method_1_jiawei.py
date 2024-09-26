@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import sys
 import os
 
-def plot_stats(file_path, n_generations, output_dir):
+def plot_stats(file_path, n_generations, output_dir, title = "Fitness over Generations Using Method 1"):
     data = np.genfromtxt(file_path, skip_header=1)
     generations = data[:, 0]
     avg_fitness = data[:, 1]
@@ -15,7 +15,7 @@ def plot_stats(file_path, n_generations, output_dir):
     plt.fill_between(generations, avg_fitness - std_dev, avg_fitness + std_dev, color='b', alpha=0.2)
     plt.plot(generations, max_fitness, label='Max Fitness', color='r')
     plt.fill_between(generations, max_fitness - std_dev, max_fitness + std_dev, color='r', alpha=0.2)
-    plt.title('Fitness over Generations Using Method 1')
+    plt.title(f'{title}')
     plt.xlabel('Generation')
     plt.ylabel('Fitness')
     plt.legend()

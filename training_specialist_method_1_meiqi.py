@@ -3,7 +3,6 @@ import sys
 import os
 import time
 import numpy as np
-from math import fabs, sqrt
 import glob
 
 from evoman.environment import Environment
@@ -11,22 +10,20 @@ from demo_controller import player_controller
 
 # imports DEAP library
 from deap import base, creator, tools, algorithms
-
 import datetime
-from line_plot_once_method_1_jiawei import plot_stats
+
 
 class GeneticAlgorithmOptimizer1:
     def __init__(self, base_experiment_name, enemies, n_hidden_neurons=10, n_population=100, n_generations=30,
                  mutation_rate=0.2):
-        # Append current datetime to make the experiment name unique
         current_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        self.experiment_name = f"{base_experiment_name}_{current_time}"
+        self.experiment_name = f"{base_experiment_name}_{enemies}_{current_time}"
 
         # Create experiment directory before environment setup
         if not os.path.exists(self.experiment_name):
             os.makedirs(self.experiment_name)
 
-        self.enemies = enemies
+        self.enemies = [enemies]
         self.n_hidden_neurons = n_hidden_neurons
         self.n_population = n_population
         self.n_generations = n_generations
@@ -49,7 +46,6 @@ class GeneticAlgorithmOptimizer1:
                           level=2,
                           speed="fastest",
                           visuals=False)
-        env.state_to_log()
         return env
 
     def calculate_num_weights(self):
@@ -111,7 +107,6 @@ class GeneticAlgorithmOptimizer1:
     def save_results(self):
         file = open(f'{self.experiment_name}/neuroended', 'w')
         file.close()
-        self.env.state_to_log()
 
     def execute(self):
         ini = time.time()
@@ -129,8 +124,6 @@ class GeneticAlgorithmOptimizer1:
         stats_file_path = f'{self.experiment_name}/stats.txt'
         np.savetxt(stats_file_path, stats_data, header='gen avg max std', comments='', fmt='%f')
 
-        # Call the plot_stats function to generate the plot
-        # plot_stats(stats_file_path, self.n_generations, self.experiment_name)
 
         fim = time.time()
         execution_time_minutes = round((fim - ini) / 60)
@@ -141,7 +134,6 @@ class GeneticAlgorithmOptimizer1:
 
         self.save_results()
         full_path = os.path.abspath(stats_file_path)
-        print(full_path)
         return full_path  # Return the path to the stats file for further analysis
 
 
@@ -152,8 +144,8 @@ if __name__ == "__main__":
         os.environ["SDL_VIDEODRIVER"] = "dummy"
 
     # Parameters
-    experiment_name = 'optimization_train_method_1'
-    enemies = [8]
+    experiment_name = 'optimization_train_method_1_meiqi'
+    enemies = 6
     n_hidden_neurons = 10
     n_population = 100
     n_generations = 30

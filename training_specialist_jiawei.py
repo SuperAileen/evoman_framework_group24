@@ -155,7 +155,7 @@ class EvolutAlgorithmOptimizer:
         record = stats.compile(population)
         logbook.record(gen=0, **record)
 
-        for gen in range(self.n_generations+1):
+        for gen in range(1, self.n_generations+1):
             parents = list(map(self.toolbox.clone, population)) 
             offspring = parents
             for mutant in offspring:
@@ -214,28 +214,70 @@ class EvolutAlgorithmOptimizer:
         print(full_path)
         return full_path 
 
+# if __name__ == "__main__":
+#     headless = True
+#     if headless:
+#         os.environ["SDL_VIDEODRIVER"] = "dummy"
+#
+#     experiment_name = 'optimization_test'
+#     enemies = [2]
+#     n_hidden_neurons = 10
+#     n_population = 100
+#     n_generations = 30
+#     mutation_rate = 0.2
+#
+#     if len(sys.argv) == 1:
+#         optimizer1 = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
+#                                               mutation_rate, sigma=0.1, mode = "GA")
+#         optimizer1.execute()
+#
+#         optimizer2 = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
+#                                               mutation_rate, sigma=0.1, mode = "ES")
+#         optimizer2.execute()
+#     elif len(sys.argv) > 1:
+#         mode = sys.argv[1]
+#         optimizer = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
+#                                               mutation_rate, sigma=0.1, mode=mode)
+#         optimizer.execute()
+
 if __name__ == "__main__":
     headless = True
     if headless:
         os.environ["SDL_VIDEODRIVER"] = "dummy"
 
-    experiment_name = 'optimization_test'
-    enemies = [2]
+    experiment_name = 'optimization_train_Jiawei'
+    gain_path = 'gain_dataframe'
     n_hidden_neurons = 10
     n_population = 100
     n_generations = 30
     mutation_rate = 0.2
+    optimizer_list = []
 
-    if len(sys.argv) == 1:
-        optimizer1 = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
-                                              mutation_rate, sigma=0.1, mode = "GA")
-        optimizer1.execute()
+    enemies_list=[[i] for i in range(1,9)]
 
-        optimizer2 = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
-                                              mutation_rate, sigma=0.1, mode = "ES")
-        optimizer2.execute()
-    elif len(sys.argv) > 1:
-        mode = sys.argv[1]
-        optimizer = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
-                                              mutation_rate, sigma=0.1, mode=mode)
-        optimizer.execute()
+    for enemies in enemies_list:
+
+        print(f"Running optimization for enemies: {enemies}")
+
+        if len(sys.argv) == 1:
+            optimizer1 = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
+                                                mutation_rate, sigma=0.1, mode = "GA")
+            optimizer1.execute()
+            optimizer_list.append(optimizer1)
+
+            optimizer2 = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
+                                                mutation_rate, sigma=0.1, mode = "ES")
+            optimizer2.execute()
+            optimizer_list.append(optimizer2)
+        elif len(sys.argv) > 1:
+            mode = sys.argv[1]
+            optimizer = EvolutAlgorithmOptimizer(experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
+                                                mutation_rate, sigma=0.1, mode=mode)
+            optimizer.execute()
+            optimizer_list.append(optimizer)
+
+
+    # all_gain_data = collect_gain_results(optimizer_list)
+    # print(all_gain_data)
+    #
+    # save_gain_results(all_gain_data=all_gain_data, experiment_name=experiment_name)

@@ -43,7 +43,7 @@ def bayesian_optimization(experiment_name, enemies, mode="GA", n_calls=20):
         # retrieve the hyperparameters
         if mode == "GA":
             n_hidden_neurons, n_population, n_generations, mutation_rate = suggested_params
-            sigma = 0.1  # GA模式下，sigma设定为默认值0.1
+            sigma = 0.1  # 
         elif mode == "ES":
             n_hidden_neurons, n_population, n_generations, mutation_rate, sigma = suggested_params
 

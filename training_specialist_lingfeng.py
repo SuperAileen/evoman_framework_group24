@@ -48,6 +48,7 @@ class EvolutAlgorithmOptimizer:
         self.toolbox = base.Toolbox()
 
         self.gain_record=[]
+        self.fit_record=[]  # record the fitness of the best individual
 
         # setup for GA or ES
         if self.mode == "GA":
@@ -132,6 +133,20 @@ class EvolutAlgorithmOptimizer:
         }
         self.gain_record.append(record)
 
+
+    def fitness_frame(self,max_fitness):
+        record = {
+            'enemies': self.enemies,
+            'n_hidden_neurons': self.n_hidden_neurons,
+            'n_population': self.n_population,
+            'n_generations': self.n_generations,
+            'mutation_rate': self.mutation_rate,
+            'sigma': self.sigma,
+            'mode': self.mode,
+            'max_fitness': max_fitness
+        }
+        self.fit_record.append(record)
+
     def mutate_es(self, individual):
         noise = np.random.normal(0, self.sigma, len(individual))
         individual += noise
@@ -175,6 +190,10 @@ class EvolutAlgorithmOptimizer:
         self.gain_frame(avg_gain, max_gain)
 
         best = hof[0]
+
+        best_fitness = best.fitness.values[0]
+        self.fitness_frame(best_fitness)  # record the fitness of the best individual 
+
         np.savetxt(f'{self.experiment_name}/best.txt', best)
 
         return population, logbook, hof
@@ -225,6 +244,10 @@ class EvolutAlgorithmOptimizer:
         self.gain_frame(avg_gain, max_gain)
 
         best = hof[0]
+
+        best_fitness = best.fitness.values[0]
+        self.fitness_frame(best_fitness)  # record the fitness of the best individual 
+
         np.savetxt(f'{self.experiment_name}/best.txt', best)
 
         return population, logbook, hof
@@ -233,6 +256,11 @@ class EvolutAlgorithmOptimizer:
         file = open(f'{self.experiment_name}/neuroended', 'w')
         file.close()
         self.env.state_to_log()
+
+    def saveget_fitness(self):
+        df=pd.DataFrame(self.fit_record)
+        df.to_csv(f'{self.experiment_name}/fitness.csv',index=False)
+        return df
 
   
     def execute(self):
@@ -265,6 +293,8 @@ class EvolutAlgorithmOptimizer:
         self.save_results()
         full_path = os.path.abspath(stats_file_path)
         print(full_path)
+        
+        self.saveget_fitness()
     
 
         return full_path 

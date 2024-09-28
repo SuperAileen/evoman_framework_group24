@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import subprocess
 import os
 import re
-from training_specialist_lingfeng import EvolutAlgorithmOptimizer  # 导入类
-from training_specialist_lingfeng import save_gain_results, collect_gain_results
+from training_specialist_jiawei import EvolutAlgorithmOptimizer  # 导入类
+# from training_specialist_lingfeng import save_gain_results, collect_gain_results
 import pandas as pd
 
 
@@ -16,11 +16,27 @@ def run_optimizer(mode, enemy):
 
     experiment_name = 'optimization_train'
     # enemies = [1, 2, 3, 4, 5, 6, 7, 8]
+
+    # 原本默认
     n_hidden_neurons = 10
     n_population = 100
     n_generations = 30
     mutation_rate = 0.2
     sigma = 0.1
+
+    # GA
+    if mode == "GA":
+        n_hidden_neurons = 7
+        n_population = 204
+        n_generations = 40
+        mutation_rate = 0.2883660095952316
+        sigma = 0.1
+    elif mode == "ES":
+        n_hidden_neurons = 14
+        n_population = 293
+        n_generations = 40
+        mutation_rate = 0.1931756788096422
+        sigma = 0.15382040354562315
 
     optimizer = EvolutAlgorithmOptimizer(experiment_name, [enemy], n_hidden_neurons, n_population, n_generations,
                                          mutation_rate, sigma, mode=mode)

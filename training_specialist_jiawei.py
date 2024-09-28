@@ -20,8 +20,15 @@ class EvolutAlgorithmOptimizer:
     def __init__(self, base_experiment_name, enemies, n_hidden_neurons=10, n_population=100, n_generations=30,
                  mutation_rate=0.2, sigma=0.1, mode = "GA"):
 
+        parent_directory = 'experiments_train_jiawei'
+        parent_directory = f'{parent_directory}_{enemies[0]}'  # make sure the parent directory is unique
+
+        if not os.path.exists(parent_directory):
+            os.makedirs(parent_directory)
+
         current_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        self.experiment_name = f"{base_experiment_name}_{enemies}_{mode}_{current_time}"
+        # self.experiment_name = f"{base_experiment_name}_{enemies}_{mode}_{current_time}"
+        self.experiment_name = os.path.join(parent_directory, f"{base_experiment_name}_{enemies}_{mode}_{current_time}")
 
         if not os.path.exists(self.experiment_name):
             os.makedirs(self.experiment_name)

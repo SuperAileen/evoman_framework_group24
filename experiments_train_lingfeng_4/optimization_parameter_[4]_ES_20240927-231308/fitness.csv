@@ -1,2 +1,0 @@
-enemies,n_hidden_neurons,n_population,n_generations,mutation_rate,sigma,mode,max_fitness
-[4],15,91,32,0.24294561632892683,0.15170649754565674,ES,86.19513097609463

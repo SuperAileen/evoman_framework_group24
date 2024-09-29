@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import subprocess
 import os
 import re
-from training_specialist_jiawei import EvolutAlgorithmOptimizer  # 导入类
+from training_specialist import EvolutAlgorithmOptimizer  # 导入类
 # from training_specialist_lingfeng import save_gain_results, collect_gain_results
 import pandas as pd
 

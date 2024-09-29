@@ -35,7 +35,7 @@ def run_optimizer(mode, enemy):
         n_hidden_neurons = 14
         n_population = 293
         n_generations = 40
-        mutation_rate = 0.1931756788096422
+        mutation_rate = 1
         sigma = 0.15382040354562315
 
     optimizer = EvolutAlgorithmOptimizer(experiment_name, [enemy], n_hidden_neurons, n_population, n_generations,

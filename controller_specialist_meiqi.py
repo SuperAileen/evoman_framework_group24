@@ -13,13 +13,15 @@ from demo_controller import player_controller
 import numpy as np
 import glob
 import matplotlib.pyplot as plt
+import os
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 def find_best_solution(method, enemy):
-    print(f'optimization_test_[{enemy}]_{method}_*'+'/best.txt')
-    file_name = "optimization_test_[[]2[]]_GA_20240926-104720/best.txt"
+    print(f'optimization_train_Jiawei_{enemy}_{method}_*'+'/best.txt')
+    file_name = f'optimization_train_Jiawei_{enemy}_{method}_*'+'/best.txt'
     best_files = glob.glob(file_name)
     # best_files = glob.glob(f'optimization_test_[[]{enemy}[]]_{method}_*'+'/best.txt')
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n",best_files)
+    # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n",best_files)
     best_fitness = -np.inf
     best_solution = None
 
@@ -34,8 +36,6 @@ def find_best_solution(method, enemy):
 
 n_hidden_neurons = 10
 
-# import os
-# os.environ["SDL_VIDEODRIVER"] = "dummy"
 env = Environment(experiment_name='best_experiment_test',
                 playermode="ai",
 				player_controller=player_controller(n_hidden_neurons),
@@ -47,11 +47,12 @@ env = Environment(experiment_name='best_experiment_test',
 				visuals=True)
 
 results = {}
-method_list = ["GA"]
-enemy_list=[2]
+method_list = ['ES', 'GA']
+enemy_list=[1,2,3,4,5,6,7,8]
 
-for method in method_list:
-     for enemy in enemy_list:
+
+for enemy in enemy_list:
+    for method in method_list:
         
         env.update_parameter('enemies',[enemy])
         sol = find_best_solution(method, enemy)
@@ -61,16 +62,16 @@ for method in method_list:
             _, player_life, enemy_life, _=env.play(sol)
             indivdual_gain=player_life-enemy_life
             individual_gain_list.append(indivdual_gain)
-        results[(method, enemy)] = individual_gain_list
+        results[(enemy, method)] = individual_gain_list
 
 
-fig, ax = plt.subplots(figsize=(10, 12))
+fig, ax = plt.subplots(figsize=(24, 12))
 data = [results[key] for key in sorted(results.keys())]
 labels = [f"Method {m}, Enemy {e}" for m, e in sorted(results.keys())]
 
 ax.boxplot(data, labels=labels)
-ax.set_title('Individual Gains for Each Method and Enemy Combination')
-ax.set_xlabel('Method, Enemy Combination')
-ax.set_ylabel('Individual Gain')
+ax.set_title('Individual Gains for Each Method and Enemy Combination', fontsize=20)
+ax.set_xlabel('Method, Enemy Combination', fontsize=16)
+ax.set_ylabel('Individual Gain', fontsize=16)
 plt.xticks(rotation=45)
 plt.savefig("box_plot.png", dpi=150)

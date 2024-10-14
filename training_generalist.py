@@ -80,8 +80,12 @@ class GeneralistOptimizer:
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 
         self.toolbox.register("evaluate", self.evaluate)
-        self.toolbox.register("mate", tools.cxBlend, alpha=0.5)
-        self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=self.mutation_rate)
+        # 修改重组策略为 Uniform Crossover
+        self.toolbox.register("mate", tools.cxUniform, indpb=0.5)
+        # 修改突变策略为随机重置突变，提升多样性
+        self.toolbox.register("mutate", tools.mutUniformInt, low=dom_l, up=dom_u, indpb=self.mutation_rate)
+        # # 修改选择策略为 Roulette Selection
+        # self.toolbox.register("select", tools.selRoulette)
         self.toolbox.register("select", tools.selTournament, tournsize=3)
 
     def setup_es(self):
@@ -92,12 +96,35 @@ class GeneralistOptimizer:
         creator.create("Individual", np.ndarray, fitness=creator.FitnessMax)
 
         self.toolbox.register("attr_float", np.random.uniform, dom_l, dom_u)
-        self.toolbox.register("individual", tools.initRepeat, creator.Individual, self.toolbox.attr_float, n=self.n_vars)
+        self.toolbox.register("individual", tools.initRepeat, creator.Individual, self.toolbox.attr_float,
+                              n=self.n_vars)
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 
         self.toolbox.register("evaluate", self.evaluate)
-        self.toolbox.register("mutate", self.mutate_es)
+        # 使用适应性步长控制的突变函数
+        self.toolbox.register("mutate", self.mutate_es_adaptive)
         self.toolbox.register("select", tools.selBest)
+
+    def mutate_es_adaptive(self, individual):
+        # 初始化步长
+        if not hasattr(individual, 'sigma'):
+            individual.sigma = np.ones(len(individual)) * self.sigma
+
+        # 调整步长：使用1/5成功率规则调整
+        tau = 1 / np.sqrt(2 * np.sqrt(len(individual)))
+        tau_prime = 1 / np.sqrt(2 * len(individual))
+
+        # 为每个维度添加随机噪声来调整步长
+        individual.sigma *= np.exp(tau_prime * np.random.normal() + tau * np.random.normal(size=len(individual)))
+
+        # 应用变异
+        noise = np.random.normal(0, individual.sigma, len(individual))
+        individual += noise
+
+        # 确保个体的基因值在允许的范围内
+        np.clip(individual, -1, 1, out=individual)
+
+        return individual,
 
     def evaluate(self, individual):
         fitness = self.env.play(pcont=np.array(individual))[0]

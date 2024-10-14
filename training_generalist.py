@@ -263,3 +263,7 @@ if __name__ == "__main__":
             generalist_optimizer = GeneralistOptimizer(experiment_name, enemy_set, n_hidden_neurons, n_population, n_generations,
                                                        mutation_rate, sigma, mode=mode)
             generalist_optimizer.execute()
+
+
+
+            

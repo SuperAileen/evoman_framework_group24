@@ -15,7 +15,7 @@ import datetime
 
 class GeneralistOptimizer:
     def __init__(self, base_experiment_name, enemy_set, n_hidden_neurons=10, n_population=100, n_generations=30,
-                 mutation_rate=0.2, sigma=0.1, mode="GA1"):
+                 mutation_rate=0.2, sigma=0.1, mode="GA1", k = 10):
 
         enemy_string = '_'.join(map(str, enemy_set))
         parent_directory = f'experiments_train_generalist_{enemy_string}'
@@ -36,6 +36,7 @@ class GeneralistOptimizer:
         self.mutation_rate = mutation_rate
         self.sigma = sigma
         self.mode = mode
+        self.k = k
 
         self.env = self.setup_environment()
         self.n_vars = self.calculate_num_weights()
@@ -105,7 +106,7 @@ class GeneralistOptimizer:
         self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=0.05, indpb=self.mutation_rate - 0.1)  # Lower mutation rate and smaller sigma
         # self.toolbox.register("select", tools.selTournament, tournsize=20)
         self.toolbox.register("select", tools.selRoulette)
-        self.toolbox.register("select_survivors", tools.selBest)  # Elitism to retain the best individuals
+        self.toolbox.register("select_survivors", tools.selBest, k = self.k)  # Elitism to retain the best individuals
 
 
     def mutate_es_adaptive(self, individual):
@@ -260,8 +261,8 @@ if __name__ == "__main__":
     mutation_rate = 0.2
     sigma = 0.1
 
-    # enemy_sets = [[1, 3, 4, 6], [2, 5, 7, 8]]
-    enemy_sets = [[1, 3, 4, 6]]
+    enemy_sets = [[1, 3, 4, 6], [2, 5, 7, 8]]
+    # enemy_sets = [[1, 3, 4, 6]]
     modes = ["GA1", "GA2"]
 
     for enemy_set in enemy_sets:

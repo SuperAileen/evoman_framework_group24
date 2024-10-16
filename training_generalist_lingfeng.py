@@ -156,13 +156,10 @@ class GeneralistOptimizer:
 
         for gen in range(self.n_generations):
 
-            # 将 individuals 转换为 list，因为 np.ndarray 不能被 json 序列化
             population_dict[gen] = [ind.tolist() for ind in population]  # 将 individuals 存入字典
             
-            # 产生新的后代
             offspring = algorithms.varAnd(population, self.toolbox, cxpb=0.5, mutpb=self.mutation_rate)
 
-            # 评估新的后代
             fitnesses = list(map(self.toolbox.evaluate, offspring))
             for ind, fit in zip(offspring, fitnesses):
                 ind.fitness.values = fit
@@ -178,18 +175,16 @@ class GeneralistOptimizer:
         """
         file_path = f"{self.experiment_name}/all_generations_population_GA.txt"
         
-        # 打开文件（使用 'w' 模式，每次执行时重写文件）
         with open(file_path, "w") as f:
-            # 遍历所有代
+        
             for gen, population in population_dict.items():
-                # 写入代数的分隔符
+            
                 f.write(f"Generation {gen}:\n")
                 
-                # 写入当前代的所有 individual
+            
                 for individual in population:
                     f.write(f"{individual}\n")  # individual 是 numpy.ndarray
                 
-                # 添加一个换行符，用来分隔每代的内容
                 f.write("\n")
         
         print(f"All populations saved to {file_path}")

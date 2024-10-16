@@ -57,15 +57,15 @@ def plot_aggregated_stats(aggregated_data_1, aggregated_data_2, enemy_set, num_r
     plt.figure(figsize=(10, 6))
 
     # Plot GA
-    plt.plot(generations_1, avg_fitness_1, label='GA - Average Fitness', color='red', linestyle='--')
+    plt.plot(generations_1, avg_fitness_1, label='Diversity-oriented GA - Average Fitness', color='red', linestyle='--')
     plt.fill_between(generations_1, avg_fitness_1 - std_dev_1, avg_fitness_1 + std_dev_1, color='red', alpha=0.2)
-    plt.plot(generations_1, max_fitness_1, label='GA - Max Fitness', color='red')
+    plt.plot(generations_1, max_fitness_1, label='Diversity-oriented GA - Max Fitness', color='red')
     plt.fill_between(generations_1, max_fitness_1 - std_dev_1, max_fitness_1 + std_dev_1, color='red', alpha=0.2)
 
     # Plot ES
-    plt.plot(generations_2, avg_fitness_2, label='ES - Average Fitness', color='blue', linestyle='--')
+    plt.plot(generations_2, avg_fitness_2, label='Elitism-oriented GA - Average Fitness', color='blue', linestyle='--')
     plt.fill_between(generations_2, avg_fitness_2 - std_dev_2, avg_fitness_2 + std_dev_2, color='blue', alpha=0.2)
-    plt.plot(generations_2, max_fitness_2, label='ES - Max Fitness', color='blue')
+    plt.plot(generations_2, max_fitness_2, label='Elitism-oriented GA - Max Fitness', color='blue')
     plt.fill_between(generations_2, max_fitness_2 - std_dev_2, max_fitness_2 + std_dev_2, color='blue', alpha=0.2)
 
     plt.title(f'Aggregated Fitness over Generations for GA and ES - Enemies {enemy_set} ({num_runs} runs)')
@@ -83,8 +83,8 @@ if __name__ == "__main__":
     enemy_sets = [[1, 3, 4, 6], [2, 5, 7, 8]]
 
     for enemy_set in enemy_sets:
-        aggregated_data_1 = aggregate_stats("GA", enemy_set, num_runs)
-        aggregated_data_2 = aggregate_stats("ES", enemy_set, num_runs)
+        aggregated_data_1 = aggregate_stats("GA1", enemy_set, num_runs)
+        aggregated_data_2 = aggregate_stats("GA2", enemy_set, num_runs)
 
         plot_aggregated_stats(aggregated_data_1, aggregated_data_2, enemy_set, num_runs)
 

@@ -15,7 +15,7 @@ import datetime
 
 class GeneralistOptimizer:
     def __init__(self, base_experiment_name, enemy_set, n_hidden_neurons=10, n_population=100, n_generations=30,
-                 mutation_rate=0.2, sigma=0.1, mode="GA"):
+                 mutation_rate=0.2, sigma=0.1, mode="GA1"):
 
         enemy_string = '_'.join(map(str, enemy_set))
         parent_directory = f'experiments_train_generalist_{enemy_string}'
@@ -42,12 +42,12 @@ class GeneralistOptimizer:
 
         self.toolbox = base.Toolbox()
 
-        if self.mode == "GA":
-            self.setup_ga()
-        elif self.mode == "ES":
-            self.setup_es()
+        if self.mode == "GA1":
+            self.setup_ga1()  # Setup for diversity-oriented GA
+        elif self.mode == "GA2":
+            self.setup_ga2()  # Setup for elitism-oriented GA
         else:
-            print("Hey! You can only choose GA or ES!")
+            print("Hey! You can only choose GA1, GA2!")
             return
 
     def setup_environment(self):
@@ -67,7 +67,8 @@ class GeneralistOptimizer:
         # Assuming the environment has a consistent sensor configuration
         return (self.env.get_num_sensors() + 1) * self.n_hidden_neurons + (self.n_hidden_neurons + 1) * 5
 
-    def setup_ga(self):
+    def setup_ga1(self):
+        # Diversity-oriented GA configuration
         dom_u = 1
         dom_l = -1
 
@@ -80,15 +81,14 @@ class GeneralistOptimizer:
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 
         self.toolbox.register("evaluate", self.evaluate)
-        # 修改重组策略为 Uniform Crossover
         self.toolbox.register("mate", tools.cxUniform, indpb=0.5)
-        # 修改突变策略为随机重置突变，提升多样性
-        self.toolbox.register("mutate", tools.mutUniformInt, low=dom_l, up=dom_u, indpb=self.mutation_rate)
-        # # 修改选择策略为 Roulette Selection
-        # self.toolbox.register("select", tools.selRoulette)
+        # self.toolbox.register("mate", tools.cxBlend, alpha=0.5)
+        self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=0.3, indpb=self.mutation_rate + 0.1)  # Higher mutation rate and larger sigma
         self.toolbox.register("select", tools.selTournament, tournsize=3)
+        # self.toolbox.register("select", tools.selRoulette)
 
-    def setup_es(self):
+    def setup_ga2(self):
+        # Elitism-oriented GA configuration
         dom_u = 1
         dom_l = -1
 
@@ -101,9 +101,12 @@ class GeneralistOptimizer:
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 
         self.toolbox.register("evaluate", self.evaluate)
-        # 使用适应性步长控制的突变函数
-        self.toolbox.register("mutate", self.mutate_es_adaptive)
-        self.toolbox.register("select", tools.selBest)
+        self.toolbox.register("mate", tools.cxOnePoint)  # Single-point crossover
+        self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=0.05, indpb=self.mutation_rate - 0.1)  # Lower mutation rate and smaller sigma
+        # self.toolbox.register("select", tools.selTournament, tournsize=20)
+        self.toolbox.register("select", tools.selRoulette)
+        self.toolbox.register("select_survivors", tools.selBest)  # Elitism to retain the best individuals
+
 
     def mutate_es_adaptive(self, individual):
         # 初始化步长
@@ -130,13 +133,10 @@ class GeneralistOptimizer:
         fitness = self.env.play(pcont=np.array(individual))[0]
         return fitness,
 
-    def mutate_es(self, individual):
-        noise = np.random.normal(0, self.sigma, len(individual))
-        individual += noise
-        return individual,
-
     def run(self):
-        if self.mode == "GA":
+        if self.mode == "GA1":
+            return self.run_ga()
+        elif self.mode == "GA2":
             return self.run_ga()
         elif self.mode == "ES":
             return self.run_es()
@@ -166,47 +166,45 @@ class GeneralistOptimizer:
 
         return population, logbook, hof
 
-    def run_es(self):
+    def get_population_GA(self):
+        """
+        记录每一代的 population 并将其保存在字典中，键是代数，值是对应代的 population。
+        返回包含所有 generations 的 population 的字典。
+        """
         population = self.toolbox.population(n=self.n_population)
-
         fitnesses = list(map(self.toolbox.evaluate, population))
         for ind, fit in zip(population, fitnesses):
             ind.fitness.values = fit
+        population_dict = {}  # 用来保存每代的 population
+        for gen in range(self.n_generations):
+            population_dict[gen] = [ind.tolist() for ind in population]  # 将 individuals 存入字典
 
-        logbook = tools.Logbook()
-        logbook.header = ['gen', 'avg', 'max', 'std']
+            offspring = algorithms.varAnd(population, self.toolbox, cxpb=0.5, mutpb=self.mutation_rate)
+            fitnesses = list(map(self.toolbox.evaluate, offspring))
+            for ind, fit in zip(offspring, fitnesses):
+                ind.fitness.values = fit
+            population = self.toolbox.select(offspring, len(population))
+        return population_dict
 
-        hof = tools.HallOfFame(1, similar=np.array_equal)
+    def save_population_GA(self, population_dict):
+        """
+        将每一代的 population 保存到同一个文本文件中。
+        文件中使用代数作为分隔符，区分每一代的 individuals。
+        """
+        file_path = f"{self.experiment_name}/all_generations_population_GA.txt"
 
-        stats = tools.Statistics(lambda ind: ind.fitness.values)
-        stats.register("avg", np.mean)
-        stats.register("std", np.std)
-        stats.register("min", np.min)
-        stats.register("max", np.max)
+        with open(file_path, "w") as f:
 
-        record = stats.compile(population)
-        logbook.record(gen=0, **record)
+            for gen, population in population_dict.items():
 
-        for gen in range(1, self.n_generations + 1):
-            parents = list(map(self.toolbox.clone, population))
-            offspring = parents
-            for mutant in offspring:
-                self.toolbox.mutate(mutant)
-                mutant.fitness.values = self.evaluate(mutant)
+                f.write(f"Generation {gen}:\n")
 
-            offspring = offspring + parents
+                for individual in population:
+                    f.write(f"{individual}\n")  # individual 是 numpy.ndarray
 
-            population[:] = self.toolbox.select(offspring, len(population))
+                f.write("\n")
 
-            hof.update(population)
-            record = stats.compile(population)
-            logbook.record(gen=gen, **record)
-            print(f"Gen {gen}: {record}")
-
-        best = hof[0]
-        np.savetxt(f'{self.experiment_name}/best.txt', best)
-
-        return population, logbook, hof
+        print(f"All populations saved to {file_path}")
 
     def save_results(self):
         file = open(f'{self.experiment_name}/neuroended', 'w')
@@ -216,8 +214,10 @@ class GeneralistOptimizer:
     def execute(self):
         ini = time.time()
 
-        if self.mode == "GA":
-            print('Starting Genetic Algorithm Optimization...')
+        if self.mode == "GA1":
+            print('Starting Diversity-Oriented Genetic Algorithm Optimization...')
+        elif self.mode == "GA2":
+            print('Starting Elitism-Oriented Genetic Algorithm Optimization...')
         elif self.mode == "ES":
             print('Starting Evolution Strategies Optimization...')
         population, logbook, hof = self.run()
@@ -241,6 +241,11 @@ class GeneralistOptimizer:
         self.save_results()
         full_path = os.path.abspath(stats_file_path)
         print(full_path)
+
+        # # if self.mode == "GA":
+        # population_dict = self.get_population_GA()
+        # self.save_population_GA(population_dict)
+
         return full_path
 
 if __name__ == "__main__":
@@ -255,15 +260,12 @@ if __name__ == "__main__":
     mutation_rate = 0.2
     sigma = 0.1
 
-    enemy_sets = [[1, 3, 4, 6], [2, 5, 7, 8]]
-    modes = ["GA", "ES"]
+    # enemy_sets = [[1, 3, 4, 6], [2, 5, 7, 8]]
+    enemy_sets = [[1, 3, 4, 6]]
+    modes = ["GA1", "GA2"]
 
     for enemy_set in enemy_sets:
         for mode in modes:
             generalist_optimizer = GeneralistOptimizer(experiment_name, enemy_set, n_hidden_neurons, n_population, n_generations,
                                                        mutation_rate, sigma, mode=mode)
             generalist_optimizer.execute()
-
-
-
-            

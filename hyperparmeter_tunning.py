@@ -116,12 +116,12 @@ if __name__ == "__main__":
     
     
     print("Running GA optimization:")
-    best_params_ga1, best_score_ga1 = bayesian_optimization(experiment_name, enemy_set, mode="GA1", n_calls=2)
+    best_params_ga1, best_score_ga1 = bayesian_optimization(experiment_name, enemy_set, mode="GA1", n_calls=20)
     print(f"Best Hyperparameters for GA: {best_params_ga1}")
     
 
     print("\nRunning ES optimization:")
-    best_params_ga2, best_score_ga2 = bayesian_optimization(experiment_name, enemy_set, mode="GA2", n_calls=2)
+    best_params_ga2, best_score_ga2 = bayesian_optimization(experiment_name, enemy_set, mode="GA2", n_calls=20)
     print(f"Best Hyperparameters for ES: {best_params_ga2}")
 
     

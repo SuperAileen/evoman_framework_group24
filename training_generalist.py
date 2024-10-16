@@ -249,24 +249,24 @@ class GeneralistOptimizer:
 
         return full_path
 
-if __name__ == "__main__":
-    headless = True
-    if headless:
-        os.environ["SDL_VIDEODRIVER"] = "dummy"
-
-    experiment_name = 'optimization_generalist'
-    n_hidden_neurons = 10
-    n_population = 100
-    n_generations = 30
-    mutation_rate = 0.2
-    sigma = 0.1
-
-    enemy_sets = [[1, 3, 4, 6], [2, 5, 7, 8]]
-    # enemy_sets = [[1, 3, 4, 6]]
-    modes = ["GA1", "GA2"]
-
-    for enemy_set in enemy_sets:
-        for mode in modes:
-            generalist_optimizer = GeneralistOptimizer(experiment_name, enemy_set, n_hidden_neurons, n_population, n_generations,
-                                                       mutation_rate, sigma, mode=mode)
-            generalist_optimizer.execute()
+# if __name__ == "__main__":
+#     headless = True
+#     if headless:
+#         os.environ["SDL_VIDEODRIVER"] = "dummy"
+#
+#     experiment_name = 'optimization_generalist'
+#     n_hidden_neurons = 10
+#     n_population = 100
+#     n_generations = 30
+#     mutation_rate = 0.2
+#     sigma = 0.1
+#
+#     enemy_sets = [[1, 3, 4, 6], [2, 5, 7, 8]]
+#     # enemy_sets = [[1, 3, 4, 6]]
+#     modes = ["GA1", "GA2"]
+#
+#     for enemy_set in enemy_sets:
+#         for mode in modes:
+#             generalist_optimizer = GeneralistOptimizer(experiment_name, enemy_set, n_hidden_neurons, n_population, n_generations,
+#                                                        mutation_rate, sigma, mode=mode)
+#             generalist_optimizer.execute()

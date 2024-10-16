@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from training_generalist_lingfeng import GeneralistOptimizer  # Updated import
+from training_generalist import GeneralistOptimizer  # Updated import
 import pandas as pd
+
 
 def run_optimizer(mode, enemy_set):
     # Set headless mode for faster experiments
@@ -18,15 +19,17 @@ def run_optimizer(mode, enemy_set):
     n_generations = 30
     mutation_rate = 0.2
     sigma = 0.1
+    k = 10
 
     optimizer = GeneralistOptimizer(experiment_name, enemy_set, n_hidden_neurons, n_population, n_generations,
-                                    mutation_rate, sigma, mode=mode)
+                                    mutation_rate, sigma, mode=mode, k = 10)
     stats_path = optimizer.execute()
 
     if os.path.exists(stats_path):
         return stats_path
     else:
         raise Exception(f"Could not find stats.txt path for {mode}")
+
 
 def aggregate_stats(mode, enemy_set, runs):
     all_data = []
@@ -42,6 +45,7 @@ def aggregate_stats(mode, enemy_set, runs):
     aggregated_data = np.column_stack(
         (mean_data[:, 0], mean_data[:, 1], mean_data[:, 2], std_data[:, 1], std_data[:, 2]))
     return aggregated_data
+
 
 def plot_aggregated_stats(aggregated_data_1, aggregated_data_2, enemy_set, num_runs):
     generations_1 = aggregated_data_1[:, 0]
@@ -77,6 +81,7 @@ def plot_aggregated_stats(aggregated_data_1, aggregated_data_2, enemy_set, num_r
     plt.savefig(f'Aggregated_Fitness_GA_ES_Enemies_{enemy_set}_{num_runs}_runs.png')
     plt.show()
 
+
 if __name__ == "__main__":
     num_runs = 10
 
@@ -90,4 +95,3 @@ if __name__ == "__main__":
 
 
 
-        

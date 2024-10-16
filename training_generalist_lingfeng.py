@@ -117,6 +117,7 @@ class GeneralistOptimizer:
 
         print("Invalid mode encountered during run.")
 
+
     def run_ga(self):
         population = self.toolbox.population(n=self.n_population)
 

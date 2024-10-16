@@ -22,7 +22,7 @@ def run_optimizer(mode, enemy_set):
     k = 10
 
     optimizer = GeneralistOptimizer(experiment_name, enemy_set, n_hidden_neurons, n_population, n_generations,
-                                    mutation_rate, sigma, mode=mode, k = 10)
+                                    mutation_rate, sigma, mode=mode, k = 10, tournment_size=3)
     stats_path = optimizer.execute()
 
     if os.path.exists(stats_path):

@@ -6,27 +6,25 @@ import matplotlib.pyplot as plt
 import subprocess
 import os
 import re
-from training_specialist_lingfeng import EvolutAlgorithmOptimizer  # 导入类 
-from training_specialist_lingfeng import save_gain_results, collect_gain_results
+from training_generalist import GeneralistOptimizer
 
-
-def bayesian_optimization(experiment_name, enemies, mode="GA", n_calls=20):
+def bayesian_optimization(experiment_name, enemy_set, mode="GA", n_calls=20):
   
-    if mode == "GA":
-        search_space = [
-            Integer(5, 20, name='n_hidden_neurons'),   
+    if mode == "GA1":
+        search_space = [ 
             Integer(50, 300, name='n_population'),    
-            Integer(20, 50, name='n_generations'),    
-            Real(0.1, 0.3, name='mutation_rate')       
+            Integer(30, 50, name='n_generations'),    
+            Real(0.1, 0.3, name='mutation_rate'),
+            Integer(2,5, name='tournament_size')       
             #
         ]
-    elif mode == "ES":
+
+    elif mode == "GA2":
         search_space = [
-            Integer(5, 20, name='n_hidden_neurons'),  
             Integer(50, 300, name='n_population'),    
-            Integer(20, 50, name='n_generations'),    
-            Real(0.1, 0.3, name='mutation_rate'),     
-            Real(0.05, 0.2, name='sigma')            
+            Integer(30, 50, name='n_generations'),    
+            Real(0.1, 0.3, name='mutation_rate'), 
+            Integer(10, 30, name='k')      
         ]
 
     
@@ -41,25 +39,27 @@ def bayesian_optimization(experiment_name, enemies, mode="GA", n_calls=20):
         suggested_params = optimizer.ask()  #get the suggested hyperparameters
 
         # retrieve the hyperparameters
-        if mode == "GA":
-            n_hidden_neurons, n_population, n_generations, mutation_rate = suggested_params
+        if mode == "GA1":
+            n_population, n_generations, mutation_rate = suggested_params
+            k=10 
             sigma = 0.1  # 
-        elif mode == "ES":
-            n_hidden_neurons, n_population, n_generations, mutation_rate, sigma = suggested_params
+            n_hidden_neurons=10
+        elif mode == "GA2":
+            n_population, n_generations, mutation_rate, k = suggested_params
+            sigma = 0.1  #
+            n_hidden_neurons=10
 
         print(f"Running trial {i + 1}/{n_calls} for mode {mode}")
-        print(f"Hyperparameters: hidden_neurons={n_hidden_neurons}, population={n_population}, "
-              f"generations={n_generations}, mutation_rate={mutation_rate}, sigma={sigma if mode == 'ES' else '0.1'}")
+        print(f"Hyperparameters:  population={n_population}, "
+              f"generations={n_generations}, mutation_rate={mutation_rate}, k={k}")
 
       
-        optimizer_instance = EvolutAlgorithmOptimizer(
-            experiment_name, enemies, n_hidden_neurons, n_population, n_generations,
-            mutation_rate, sigma, mode=mode  # get the optimizer instance
-        )
-        optimizer_instance.execute()
+        generalist_optimizer = GeneralistOptimizer(experiment_name, enemy_set, n_hidden_neurons, n_population, n_generations,
+                                    mutation_rate, sigma, mode=mode, k=k, tournment_size=3)
+        generalist_optimizer.execute()
 
         
-        results = optimizer_instance.saveget_fitness()
+        results = generalist_optimizer.saveget_fitness()
         
         fitness = results['max_fitness'].item()   # get the max fitness value
 
@@ -67,11 +67,10 @@ def bayesian_optimization(experiment_name, enemies, mode="GA", n_calls=20):
 
     
         all_results.append({
-            'n_hidden_neurons': n_hidden_neurons,
             'n_population': n_population,
             'n_generations': n_generations,
             'mutation_rate': mutation_rate,
-            'sigma': sigma if mode == "ES" else 0.1,  
+            'k': k if mode == "GA2" else 10,  
             'fitness': fitness
         })
 
@@ -86,11 +85,12 @@ def bayesian_optimization(experiment_name, enemies, mode="GA", n_calls=20):
                 'n_population': n_population,
                 'n_generations': n_generations,
                 'mutation_rate': mutation_rate,
-                'sigma': sigma if mode == "ES" else 0.1  # GA模式下sigma为0.1
+                'k': k if mode == "GA2" else 10  # GA模式下sigma为0.1
             }
 
-    print(f"Best Hyperparameters for mode {mode}: {best_params}")
-    print(f"Best Fitness: {best_score}")
+    #print(f"Best Hyperparameters for mode {mode}: {best_params}")
+    #print(f"Best Fitness: {best_score}")
+    
 
     output_dir = f'{experiment_name}'
     if not os.path.exists(output_dir):
@@ -99,7 +99,7 @@ def bayesian_optimization(experiment_name, enemies, mode="GA", n_calls=20):
     
     all_results_df = pd.DataFrame(all_results)
     all_results_df.to_csv(f'{output_dir}/bayes_search_results_{mode}.csv', index=False)
-    print(f"Bayesian optimization results saved to {output_dir}/bayes_search_results_{mode}.csv")
+    #print(f"Bayesian optimization results saved to {output_dir}/bayes_search_results_{mode}.csv")
 
     return best_params, best_score
 
@@ -109,17 +109,19 @@ if __name__ == "__main__":
     if headless:
         os.environ["SDL_VIDEODRIVER"] = "dummy"
 
-    experiment_name = 'optimization_parameter'
+    experiment_name = 'generalist_parameter_optimization'
 
-    enemies = [4]
+    enemy_set = [1,2,3,4,5,6,7,8]
 
     
     
     print("Running GA optimization:")
-    best_params_ga, best_score_ga = bayesian_optimization(experiment_name, enemies, mode="GA", n_calls=20)
-    print(f"Best Hyperparameters for GA: {best_params_ga}")
+    best_params_ga1, best_score_ga1 = bayesian_optimization(experiment_name, enemy_set, mode="GA1", n_calls=2)
+    print(f"Best Hyperparameters for GA: {best_params_ga1}")
     
 
     print("\nRunning ES optimization:")
-    best_params_es, best_score_es = bayesian_optimization(experiment_name, enemies, mode="ES", n_calls=20)
-    print(f"Best Hyperparameters for ES: {best_params_es}")
+    best_params_ga2, best_score_ga2 = bayesian_optimization(experiment_name, enemy_set, mode="GA2", n_calls=2)
+    print(f"Best Hyperparameters for ES: {best_params_ga2}")
+
+    

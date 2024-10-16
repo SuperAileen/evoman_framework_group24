@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from training_generalist import GeneralistOptimizer  # Updated import
+from training_generalist_lingfeng import GeneralistOptimizer  # Updated import
 import pandas as pd
 
 def run_optimizer(mode, enemy_set):

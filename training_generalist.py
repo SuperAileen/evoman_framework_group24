@@ -5,6 +5,7 @@ import numpy as np
 from math import fabs, sqrt
 import glob
 import sys
+import pandas as pd
 
 from evoman.environment import Environment
 from demo_controller import player_controller
@@ -15,7 +16,7 @@ import datetime
 
 class GeneralistOptimizer:
     def __init__(self, base_experiment_name, enemy_set, n_hidden_neurons=10, n_population=100, n_generations=30,
-                 mutation_rate=0.2, sigma=0.1, mode="GA1", k = 10):
+                 mutation_rate=0.2, sigma=0.1, mode="GA1", k = 10, tournment_size=3):
 
         enemy_string = '_'.join(map(str, enemy_set))
         parent_directory = f'experiments_train_generalist_{enemy_string}'
@@ -37,11 +38,14 @@ class GeneralistOptimizer:
         self.sigma = sigma
         self.mode = mode
         self.k = k
+        self.tournment_size = tournment_size    
 
         self.env = self.setup_environment()
         self.n_vars = self.calculate_num_weights()
 
         self.toolbox = base.Toolbox()
+
+        self.fit_record=[]
 
         if self.mode == "GA1":
             self.setup_ga1()  # Setup for diversity-oriented GA
@@ -85,7 +89,7 @@ class GeneralistOptimizer:
         self.toolbox.register("mate", tools.cxUniform, indpb=0.5)
         # self.toolbox.register("mate", tools.cxBlend, alpha=0.5)
         self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=0.3, indpb=self.mutation_rate + 0.1)  # Higher mutation rate and larger sigma
-        self.toolbox.register("select", tools.selTournament, tournsize=3)
+        self.toolbox.register("select", tools.selTournament, tournsize=self.tournment_size)
         # self.toolbox.register("select", tools.selRoulette)
 
     def setup_ga2(self):
@@ -134,6 +138,19 @@ class GeneralistOptimizer:
         fitness = self.env.play(pcont=np.array(individual))[0]
         return fitness,
 
+    def fitness_framework(self, max_fitness):
+        record = {
+            'enemies': self.enemy_set,
+            'n_hidden_neurons': self.n_hidden_neurons,
+            'n_population': self.n_population,
+            'n_generations': self.n_generations,
+            'mutation_rate': self.mutation_rate,
+            'k': self.k,
+            'mode': self.mode,
+            'max_fitness': max_fitness
+        }
+        self.fit_record.append(record)
+
     def run(self):
         if self.mode == "GA1":
             return self.run_ga()
@@ -163,6 +180,9 @@ class GeneralistOptimizer:
                                                   ngen=self.n_generations, stats=stats, halloffame=hof, verbose=True)
 
         best = hof[0]
+        best_fitness = best.fitness.values[0]
+        self.fitness_framework(best_fitness)
+
         np.savetxt(f'{self.experiment_name}/best.txt', best)
 
         return population, logbook, hof
@@ -212,6 +232,11 @@ class GeneralistOptimizer:
         file.close()
         self.env.state_to_log()
 
+    def saveget_fitness(self):
+        df=pd.DataFrame(self.fit_record)
+        df.to_csv(f'{self.experiment_name}/fitness.csv',index=False)
+        return df
+
     def execute(self):
         ini = time.time()
 
@@ -221,6 +246,7 @@ class GeneralistOptimizer:
             print('Starting Elitism-Oriented Genetic Algorithm Optimization...')
         elif self.mode == "ES":
             print('Starting Evolution Strategies Optimization...')
+            
         population, logbook, hof = self.run()
 
         gen = logbook.select("gen")
@@ -243,9 +269,12 @@ class GeneralistOptimizer:
         full_path = os.path.abspath(stats_file_path)
         print(full_path)
 
+        self.saveget_fitness()
+    
+
         # # if self.mode == "GA":
-        # population_dict = self.get_population_GA()
-        # self.save_population_GA(population_dict)
+        population_dict = self.get_population_GA()
+        self.save_population_GA(population_dict)
 
         return full_path
 

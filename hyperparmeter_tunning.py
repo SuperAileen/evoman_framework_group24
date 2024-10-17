@@ -8,7 +8,7 @@ import os
 import re
 from training_generalist import GeneralistOptimizer
 
-def bayesian_optimization(experiment_name, enemy_set, mode="GA", n_calls=20):
+def bayesian_optimization(experiment_name, enemy_set, mode="GA1", n_calls=20):
   
     if mode == "GA1":
         search_space = [ 
@@ -40,7 +40,7 @@ def bayesian_optimization(experiment_name, enemy_set, mode="GA", n_calls=20):
 
         # retrieve the hyperparameters
         if mode == "GA1":
-            n_population, n_generations, mutation_rate = suggested_params
+            n_population, n_generations, mutation_rate, tournament_size = suggested_params
             k=10 
             sigma = 0.1  # 
             n_hidden_neurons=10
@@ -48,14 +48,15 @@ def bayesian_optimization(experiment_name, enemy_set, mode="GA", n_calls=20):
             n_population, n_generations, mutation_rate, k = suggested_params
             sigma = 0.1  #
             n_hidden_neurons=10
+            tournament_size=3
 
         print(f"Running trial {i + 1}/{n_calls} for mode {mode}")
         print(f"Hyperparameters:  population={n_population}, "
-              f"generations={n_generations}, mutation_rate={mutation_rate}, k={k}")
+              f"generations={n_generations}, mutation_rate={mutation_rate}, k={k}, tournament_size={tournament_size}")
 
       
         generalist_optimizer = GeneralistOptimizer(experiment_name, enemy_set, n_hidden_neurons, n_population, n_generations,
-                                    mutation_rate, sigma, mode=mode, k=k, tournment_size=3)
+                                    mutation_rate, sigma, mode=mode, k=k, tournment_size=tournament_size)
         generalist_optimizer.execute()
 
         
@@ -70,7 +71,8 @@ def bayesian_optimization(experiment_name, enemy_set, mode="GA", n_calls=20):
             'n_population': n_population,
             'n_generations': n_generations,
             'mutation_rate': mutation_rate,
-            'k': k if mode == "GA2" else 10,  
+            'k': k if mode == "GA2" else 10, 
+            'tournament_size': tournament_size if mode == "GA1" else 3,
             'fitness': fitness
         })
 
@@ -85,7 +87,8 @@ def bayesian_optimization(experiment_name, enemy_set, mode="GA", n_calls=20):
                 'n_population': n_population,
                 'n_generations': n_generations,
                 'mutation_rate': mutation_rate,
-                'k': k if mode == "GA2" else 10  # GA模式下sigma为0.1
+                'k': k if mode == "GA2" else 10,  # GA模式下sigma为0.1
+                'tournament_size': tournament_size if mode == "GA1" else 3 # GA模式下k为10
             }
 
     #print(f"Best Hyperparameters for mode {mode}: {best_params}")
@@ -117,11 +120,13 @@ if __name__ == "__main__":
     
     print("Running GA optimization:")
     best_params_ga1, best_score_ga1 = bayesian_optimization(experiment_name, enemy_set, mode="GA1", n_calls=20)
-    print(f"Best Hyperparameters for GA: {best_params_ga1}")
+    print(f"Best Hyperparameters for GA1: {best_params_ga1}")
     
 
     print("\nRunning ES optimization:")
     best_params_ga2, best_score_ga2 = bayesian_optimization(experiment_name, enemy_set, mode="GA2", n_calls=20)
-    print(f"Best Hyperparameters for ES: {best_params_ga2}")
+
+    print(f"Best Hyperparameters for GA1: {best_params_ga1}")
+    print(f"Best Hyperparameters for GA2: {best_params_ga2}")
 
     

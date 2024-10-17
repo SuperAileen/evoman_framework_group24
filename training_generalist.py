@@ -19,7 +19,7 @@ class GeneralistOptimizer:
                  mutation_rate=0.2, sigma=0.1, mode="GA1", k = 10, tournment_size=3):
 
         enemy_string = '_'.join(map(str, enemy_set))
-        parent_directory = f'experiments_train_generalist_{enemy_string}'
+        parent_directory = f'diversity_train_generalist_{enemy_string}'
 
         if not os.path.exists(parent_directory):
             os.makedirs(parent_directory)
@@ -246,7 +246,7 @@ class GeneralistOptimizer:
             print('Starting Elitism-Oriented Genetic Algorithm Optimization...')
         elif self.mode == "ES":
             print('Starting Evolution Strategies Optimization...')
-            
+
         population, logbook, hof = self.run()
 
         gen = logbook.select("gen")

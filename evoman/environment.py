@@ -599,7 +599,7 @@ class Environment(object):
         for e in self.enemies:
 
             fitness, playerlife, enemylife, time  = self.run_single(e,pcont,econt)
-            vfitness.append(fitness)
+            vfitness.append(fitness) 
             vplayerlife.append(playerlife)
             venemylife.append(enemylife)
             vtime.append(time)
